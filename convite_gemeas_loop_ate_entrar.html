@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#062613">
+  <title>18 anos das gêmeas</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; min-height: 100svh;
+      display: grid; place-items: center;
+      padding: 12px; background: #03170c;
+      background-image: radial-gradient(ellipse at top, #123c22 0%, #03170c 68%);
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+    main {
+      width: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+    }
+    .invite {
+      position: relative;
+      /* Ajusta pela largura e altura disponíveis sem deslocar os CTAs da imagem. */
+      width: min(100%, 650px, calc((100svh - 48px) * 0.6666666667));
+      line-height: 0; flex: 0 0 auto;
+      overflow: hidden; isolation: isolate;
+      box-shadow: 0 0 34px #d8ad3c35; border-radius: 3px;
+    }
+    .invite img { display: block; width: 100%; height: auto; }
+    .cta {
+      position: absolute; display: block; z-index: 2; border-radius: 40px;
+      outline: none; color: transparent; font-size: 0; line-height: 0;
+      background: transparent; -webkit-tap-highlight-color: transparent;
+    }
+    /* Área clicável sobre o botão dourado “CLIQUE AQUI”. */
+    .cta-convite { left: 17%; top: 68%; width: 66%; height: 7%; }
+    /* Área clicável sobre o botão dourado “SUGESTÕES DE PRESENTES”. */
+    .cta-presentes { left: 20%; top: 76.2%; width: 60%; height: 7%; }
+    /* Área clicável invisível sobre o botão “COMO CHEGAR” que já existe na imagem. */
+    .cta-como-chegar { left: 20%; top: 84.5%; width: 60%; height: 7%; }
+    .cta:focus-visible {
+      outline: 3px solid #fff2ad; outline-offset: 3px;
+      box-shadow: 0 0 0 6px #062613, 0 0 22px #ffdc69;
+    }
+    /* Sem efeito de hover: a imagem permanece visualmente natural. */
+    .cta:active { opacity: .92; }
+    .suggestions-modal[hidden] { display: none; }
+    .suggestions-modal {
+      position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
+      padding: 18px; background: rgba(0, 12, 5, .88); backdrop-filter: blur(5px);
+    }
+    .suggestions-panel {
+      position: relative; width: min(100%, 534px); max-height: 94vh;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .suggestions-panel img {
+      display: block; max-width: 100%; max-height: 88vh; width: auto; height: auto;
+      object-fit: contain; border: 1px solid #d9b34c; border-radius: 4px;
+      box-shadow: 0 0 30px #d9b34c35;
+    }
+    .modal-close {
+      position: absolute; top: 8px; right: 8px; z-index: 1; width: 42px; height: 42px;
+      border: 1px solid #f2d36d; border-radius: 50%; background: #062613; color: #fff2ad;
+      font: 28px/1 Arial, sans-serif; cursor: pointer;
+    }
+    .modal-close:focus-visible { outline: 3px solid white; outline-offset: 3px; }
+    .hint { color: #e7d69b; font: 13px/1.5 Arial, sans-serif; text-align: center; max-width: 650px; margin: 0 auto; }
+    @media (max-height: 520px) and (orientation: landscape) {
+      body { padding: 8px; }
+      .invite { width: min(54vw, 650px, calc((100svh - 32px) * 0.7458677686)); }
+      .hint { font-size: 11px; }
+    }
+
+    /* Entrada cinematográfica com borboleta dourada */
+    body { overflow-x: hidden; }
+    .intro {
+      position: fixed; inset: 0; z-index: 1000;
+      display: grid; place-items: center; overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 42%, rgba(20, 76, 39, .72), transparent 54%),
+        radial-gradient(ellipse at top, #0a321a 0%, #03170c 72%);
+      opacity: 1; visibility: visible;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+    .intro.is-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
+    .intro-glow {
+      position: absolute; width: min(72vw, 520px); aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 218, 100, .12), rgba(212, 166, 45, .035) 42%, transparent 70%);
+      filter: blur(8px);
+      animation: glowPulse 2.2s ease-in-out infinite alternate;
+    }
+    .intro-title {
+      position: absolute; left: 50%; top: 66%;
+      transform: translate(-50%, -50%);
+      width: 90%; text-align: center; color: #f6df91;
+      font: 12px/1.8 Arial, sans-serif; letter-spacing: .34em;
+      text-transform: uppercase; opacity: 0;
+      animation: titleReveal .8s ease 2.15s forwards;
+      text-shadow: 0 0 18px rgba(255, 211, 91, .45);
+    }
+    .butterfly-flight {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .gold-butterfly {
+      position: absolute; left: 0; top: 0; width: 92px; height: 92px;
+      filter: drop-shadow(0 0 7px #ffd75e) drop-shadow(0 0 18px rgba(255, 204, 64, .8));
+      offset-path: path("M -80 520 C 80 430, 120 250, 300 330 S 510 520, 650 300 S 850 150, 1120 70");
+      offset-rotate: auto;
+      animation: butterflyJourney 3.7s cubic-bezier(.35,.05,.25,1) infinite;
+    }
+    .wing {
+      transform-box: fill-box; transform-origin: center;
+      animation: wingFlap .22s ease-in-out infinite alternate;
+    }
+    .wing.right { animation-delay: -.11s; }
+    .spark {
+      position: absolute; width: 4px; height: 4px; border-radius: 50%;
+      background: #ffe99a; box-shadow: 0 0 7px 2px #e7b83f, 0 0 17px #d9a82b;
+      opacity: 0; animation: sparkDrift 1.7s ease-out infinite;
+    }
+    .spark.s1 { left: 24%; top: 58%; animation-delay: .2s; }
+    .spark.s2 { left: 37%; top: 44%; animation-delay: .6s; }
+    .spark.s3 { left: 55%; top: 35%; animation-delay: .9s; }
+    .spark.s4 { left: 70%; top: 27%; animation-delay: 1.2s; }
+    .spark.s5 { left: 48%; top: 61%; animation-delay: .4s; }
+    .intro-skip {
+      position: absolute; bottom: max(24px, env(safe-area-inset-bottom));
+      left: 50%; transform: translateX(-50%);
+      padding: 10px 17px; border: 1px solid rgba(242, 211, 109, .55);
+      border-radius: 30px; background: rgba(3, 23, 12, .5);
+      color: #f6df91; font: 12px Arial, sans-serif; letter-spacing: .08em;
+      cursor: pointer; transition: background .2s ease, border-color .2s ease;
+    }
+    .intro-skip:hover { background: rgba(217, 179, 76, .12); border-color: #f2d36d; }
+    .intro-skip:focus-visible { outline: 2px solid white; outline-offset: 4px; }
+    @keyframes butterflyJourney {
+      0% { offset-distance: 0%; transform: scale(.52) rotate(-18deg); opacity: 0; }
+      8% { opacity: 1; }
+      25% { transform: scale(.8) rotate(7deg); }
+      55% { transform: scale(1.04) rotate(-5deg); }
+      78% { transform: scale(.95) rotate(8deg); }
+      92% { opacity: 1; }
+      100% { offset-distance: 100%; transform: scale(.65) rotate(0deg); opacity: 0; }
+    }
+    @keyframes wingFlap { from { transform: rotateY(0deg) scaleX(1); } to { transform: rotateY(58deg) scaleX(.68); } }
+    @keyframes sparkDrift {
+      0% { opacity: 0; transform: translate(0, 14px) scale(.3); }
+      30% { opacity: 1; }
+      100% { opacity: 0; transform: translate(18px, -45px) scale(1.25); }
+    }
+    @keyframes glowPulse { from { opacity: .45; transform: scale(.88); } to { opacity: 1; transform: scale(1.08); } }
+    @keyframes titleReveal { from { opacity: 0; letter-spacing: .5em; } to { opacity: 1; letter-spacing: .24em; } }
+    @media (max-width: 600px) {
+      .gold-butterfly { width: 70px; height: 70px; }
+      .intro-title { top: 65%; font-size: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .intro, .intro * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="intro" id="intro" aria-label="Animação de entrada" role="status">
+    <div class="intro-glow" aria-hidden="true"></div>
+    <div class="butterfly-flight" aria-hidden="true">
+      <span class="spark s1"></span><span class="spark s2"></span>
+      <span class="spark s3"></span><span class="spark s4"></span><span class="spark s5"></span>
+      <svg class="gold-butterfly" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <linearGradient id="goldWing" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fff5bd"/>
+            <stop offset=".42" stop-color="#f5cf55"/>
+            <stop offset="1" stop-color="#a86b13"/>
+          </linearGradient>
+        </defs>
+        <g class="wing left">
+          <path d="M49 48 C34 14 9 9 8 28 C7 43 25 51 43 55 C20 51 12 62 22 72 C31 80 43 67 49 55 Z" fill="url(#goldWing)" stroke="#fff0a0" stroke-width="1.5"/>
+          <path d="M45 49 C29 30 19 25 14 23 M44 55 C30 57 25 64 25 69 M39 48 C34 39 32 34 31 29" fill="none" stroke="#fff4c4" stroke-width="1" opacity=".9"/>
+          <circle cx="17" cy="29" r="2" fill="#fff9d7"/><circle cx="28" cy="67" r="1.8" fill="#fff9d7"/>
+        </g>
+        <g class="wing right">
+          <path d="M51 48 C66 14 91 9 92 28 C93 43 75 51 57 55 C80 51 88 62 78 72 C69 80 57 67 51 55 Z" fill="url(#goldWing)" stroke="#fff0a0" stroke-width="1.5"/>
+          <path d="M55 49 C71 30 81 25 86 23 M56 55 C70 57 75 64 75 69 M61 48 C66 39 68 34 69 29" fill="none" stroke="#fff4c4" stroke-width="1" opacity=".9"/>
+          <circle cx="83" cy="29" r="2" fill="#fff9d7"/><circle cx="72" cy="67" r="1.8" fill="#fff9d7"/>
+        </g>
+        <path d="M50 42 C46 32 46 26 43 23 M50 42 C54 32 54 26 57 23" fill="none" stroke="#f5d76f" stroke-width="1.5" stroke-linecap="round"/>
+        <ellipse cx="50" cy="54" rx="3.2" ry="15" fill="#fff0a0" stroke="#9b6419" stroke-width="1"/>
+        <circle cx="50" cy="40" r="4" fill="#fff4bd" stroke="#c18a25" stroke-width="1"/>
+      </svg>
+    </div>
+    <p class="intro-title">Um momento especial está prestes a começar</p>
+    <button class="intro-skip" id="intro-skip" type="button">Entrar no convite&nbsp; ✦</button>
+  </div>
+
+  <audio id="musica" autoplay loop preload="auto" aria-hidden="true">
+    <source src="um-novo-dia2.mp3" type="audio/mpeg">
+  </audio>
+
+  <main>
+    <div class="invite" aria-label="Convite de 18 anos das gêmeas">
+      <img src="convite-gemeas.png" alt="Convite verde e dourado dos 18 anos das gêmeas, com os botões Clique aqui, Sugestões de presentes e Como chegar." width="1024" height="1536">
+      <a class="cta cta-convite"
+         href="https://docs.google.com/forms/d/e/1FAIpQLSfmRT5cYstnEco4qw3Tby9ZlO-31pfSvI1OQzUu99KdMthiHg/viewform?usp=header"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Clique aqui para abrir o convite completo e confirmar presença">Clique aqui — convite completo</a>
+      <a class="cta cta-presentes" href="#sugestoes" id="cta-presentes"
+         aria-haspopup="dialog" aria-controls="modal-sugestoes"
+         aria-label="Abrir sugestões de presentes">Sugestões de presentes</a>
+      <a class="cta cta-como-chegar"
+         href="https://www.google.com/maps/place/Espa%C3%A7o+C%C3%A9sar+%E2%80%93+Celebre+com+eleg%C3%A2ncia/@-19.7648897,-44.0756945,17z/data=!4m15!1m8!3m7!1s0xa68d18205c9f1b:0x9f6207666b23175c!2sR.+Santos+De+Oliveira+E+Silva,+208+-+Bom+Sossego,+Ribeir%C3%A3o+das+Neves+-+MG,+33860-060!3b1!8m2!3d-19.7648897!4d-44.0756945!16s%2Fg%2F11lmp9fqcz!3m5!1s0xa68dc093074457:0x8a5fd870d2aa0f5e!8m2!3d-19.7648897!4d-44.0756945!16s%2Fg%2F11y_s495qd?entry=ttu&g_ep=EgoyMDI2MTAwNy4wIKXMDSoASAFQAw%3D%3D"
+         target="_blank" rel="noopener noreferrer"
+         aria-label="Como chegar: abrir a localização da festa no Google Maps"
+         title="Como chegar">Como chegar</a>
+    </div>
+    <p class="hint">Toque nos botões dourados do convite para abrir os links.</p>
+  </main>
+
+  <div class="suggestions-modal" id="modal-sugestoes" role="dialog" aria-modal="true"
+       aria-label="Sugestões de presentes" hidden>
+    <div class="suggestions-panel">
+      <button class="modal-close" type="button" id="fechar-sugestoes" aria-label="Fechar sugestões de presentes">×</button>
+      <img src="sugestoes-presentes.png" alt="Sugestões de presentes: sapatos tamanho 36, calça tamanho 36, blusa ou camisa tamanho P, acessórios dourados, maquiagem e autocuidado.">
+    </div>
+  </div>
+
+  <script>
+
+    // Música local em MP3, sem controles visíveis.
+    const musica = document.getElementById("musica");
+    musica.volume = 0.35;
+
+    // Tenta iniciar ao carregar. Alguns navegadores bloqueiam áudio automático
+    // até que o visitante interaja com a página.
+    function iniciarMusica() {
+      musica.play().catch(() => {});
+    }
+
+    iniciarMusica();
+
+    // A animação de entrada termina sozinha ou pode ser pulada pelo visitante.
+    const intro = document.getElementById("intro");
+    const skipIntro = document.getElementById("intro-skip");
+    function encerrarIntro() {
+      if (!intro || intro.classList.contains("is-leaving")) return;
+      intro.classList.add("is-leaving");
+      window.setTimeout(() => intro.remove(), 1100);
+    }
+
+    // O clique no botão de entrada também inicia a música caso o navegador
+    // tenha bloqueado a reprodução automática.
+    skipIntro.addEventListener("click", function () {
+      iniciarMusica();
+      encerrarIntro();
+    });
+    // A animação permanece em loop até o visitante clicar em “Entrar no convite”.
+    // Em dispositivos que preferem movimento reduzido, o CSS reduz a animação,
+    // mas a tela inicial continua aguardando o clique.
+
+    const botaoPresentes = document.getElementById("cta-presentes");
+    const modalSugestoes = document.getElementById("modal-sugestoes");
+    const fecharSugestoes = document.getElementById("fechar-sugestoes");
+
+    function abrirSugestoes(event) {
+      event.preventDefault();
+      modalSugestoes.hidden = false;
+      document.body.style.overflow = "hidden";
+      fecharSugestoes.focus();
+    }
+
+    function fecharModal() {
+      modalSugestoes.hidden = true;
+      document.body.style.overflow = "";
+      botaoPresentes.focus();
+    }
+
+    botaoPresentes.addEventListener("click", abrirSugestoes);
+    fecharSugestoes.addEventListener("click", fecharModal);
+    modalSugestoes.addEventListener("click", function (event) {
+      if (event.target === modalSugestoes) fecharModal();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !modalSugestoes.hidden) fecharModal();
+    });
+  </script>
+</body>
+</html>
